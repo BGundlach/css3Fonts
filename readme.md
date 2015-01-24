@@ -1,3 +1,5 @@
+# css3fonts
+
 QUICK START GUIDE:
 ------------------
 
@@ -22,7 +24,7 @@ the other fonts.
 
 FULL COMMAND LINE OPTIONS:
 ---------------------------
-
+```
 Usage: /Users/zhawry/bin/convertFonts.sh [-options] [fontfilelist]
 
 Where: - [fontfilelist] is a space separated list of True Type (.ttf) or
@@ -63,50 +65,87 @@ Where: - [fontfilelist] is a space separated list of True Type (.ttf) or
          be OpenType or TrueType.
          
          --help: This help menu.
+```
 
 SUPPORTED OSes:
 ---------------
 
 Windows (using Cygwin), OS X and Linux (tested on Ubuntu 10.10 Maverick
-Meerkat).  Please let us know if you find it works on others.
+Meerkat and crunchbang 11 waldorf).  Please let us know if you find it works on others.
 
 This script should run on any version of UNIX running bash.
-Installation instructions and more information can be found at
-https://github.com/zoltan-dulac/css3FontConverter
+Installation instructions and more information can be found at [Gundlach Marketing](http://gundlach-marketing.com/blog/create-webfont-css-kits-from-your-command-line "webfonts from your command line")
 
 
 REQUIREMENTS:
 -------------
 
 This script uses the following programs to do the heavy listing.
-  - Fontforge:      http://fontforge.sourceforge.net/
-  - EOTFAST:        http://eotfast.com/
-  - ttf2eot:        http://code.google.com/p/ttf2eot/)
-  - sfnt2woff:      http://people.mozilla.com/~jkew/woff/
-  - ttfautohint:    http://www.freetype.org/ttfautohint/
-  - woff2_compress: http://code.google.com/p/font-compression-reference/w/list
+  - Fontforge:      [http://fontforge.sourceforge.net/](http://fontforge.sourceforge.net/)
+  - ttf2eot:        [http://www.npmjs.com/package/ttf2eot](http://www.npmjs.com/package/ttf2eot)
+  - sfnt2woff:      [http://people.mozilla.com/~jkew/woff/](http://people.mozilla.com/~jkew/woff/)
+  - ttfautohint:    [http://www.freetype.org/ttfautohint/](http://www.freetype.org/ttfautohint/)
+  - woff2_compress: [http://code.google.com/p/font-compression-reference/w/list](http://code.google.com/p/font-compression-reference/w/list)
+  - EOTFAST:        [http://eotfast.com/  *windows only*](http://eotfast.com/)
   
-Full instructions on how to install these packages are at:
+INSTALLATION:
+-------------
 
-http://www.useragentman.com/blog/2011/02/20/converting-font-face-fonts-quickly-in-any-os/
+The below commands will install the necessary dependencies on debian or ubuntu as well as the css3fonts script. 
+
+I'm assuming you have git and [node.js](nodejs.org) installed (if not, install node now).  You can add git to the end of the first command if you don't have it already.
+
+```bash
+sudo apt-get install ttfautohint fontforge # git if you don't have it
+sudo npm install -g ttf2eot  # need node for this
+```
+
+
+```
+mkdir ~/bin/sfnt2woff-src
+wget http://people.mozilla.org/~jkew/woff/woff-code-latest.zip
+unzip woff-code-latest -d ~/bin/sfnt2woff-src
+rm woff-code-latest.zip
+cd ~/bin/sfnt2woff-src
+make
+cp sfnt2woff woff2sfnt ../
+git clone https://github.com/google/woff2.git
+cd woff2
+git submodule init
+git submodule update
+make clean all
+cp woff2_compress woff2_decompress ../
+cd ../
+git clone https://github.com/BGundlach/css3FontConverter.git
+ln -sT css3FontConverter/css3fonts ~/bin/css3fonts
+rm -r sfnt2woff-src woff2
+
+```
 
 LICENSE:
 --------
 
-This code is released under the LGPL.  License can be found at http://www.gnu.org/licenses/lgpl.html
+This code is released under the WTFPL 3.0.  License can be found in the license file.  It is based off of
+[Sam Hocevar's WTFPL](http://wtfpl.net)
 
 CHANGELOG:
 ----------
 
+### Authored By Zoltan
+
 Feb 20, 2011 - Initial Release
-Sep 22, 2013 - Added support for font-weight and autohinting, as well as
-               reporting what font-feature-support tags (i.e. OpenType feature
-               tags) are implemented by a font.
-Sep 02, 2014 - Added support for WOFF2 fonts, if woff2_compress is in the user's
-               path.  This program can be retrieved from here:
-               http://code.google.com/p/font-compression-reference/w/list
+
+Sep 22, 2013 - Added support for font-weight and autohinting, as well as reporting what font-feature-support tags (i.e. OpenType feature tags) are implemented by a font.
+
+Sep 02, 2014 - Added support for WOFF2 fonts, if woff2_compress is in the user's path.  This program can be retrieved from here: http://code.google.com/p/font-compression-reference/w/list
+
+### Authored By Brian
+
+Jan 24, 2015 - Added symlink frindly code as well as a debian install script and updated ttf2eot to the maintained node module
+
 CONTACT:
 --------
 
-Any bug reports, fixes or feature requests: zoltan.dulac@gmail.com.  
-Code available at https://github.com/zoltan-dulac/css3FontConverter
+Any bug reports, fixes or feature requests should be poted to the github repo at [https://github.com/BGundlach/css3FontConverter](https://github.com/BGundlach/css3FontConverter "css3fonts")
+
+If you think this script is pretty slick and want to hire me as a front end developer, contact me at GundlachWebDesign@gmail.com
