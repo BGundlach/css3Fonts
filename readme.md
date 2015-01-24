@@ -93,7 +93,7 @@ INSTALLATION:
 
 The below commands will install the necessary dependencies on debian or ubuntu as well as the css3fonts script. 
 
-I'm assuming you have git and [node.js](nodejs.org) installed (if not, install node now).  You can add git to the end of the first command if you don't have it already.
+I'm assuming you have git and [node.js](http://nodejs.org) installed (if not, install node now).  You can add git to the end of the first command if you don't have it already.
 
 ```bash
 sudo apt-get install ttfautohint fontforge # git if you don't have it
