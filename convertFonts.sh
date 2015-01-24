@@ -11,12 +11,12 @@
 ##                     change.                                          #
 #########################################################################
 
-# The path should contain the directories where EOTFAST-1.EXE, ttf2eot,
+# The path should contain the directories where ttf2eot,
 # fontforge, ttfautohint and all the scripts in the @Font-Face Contruction Set reside.
 # Uncomment the line below with the right directories.  Remember the 
 # $PATH at the beginning of the string, or the script will forget what
 # was originally in the PATH.
-PATH="$PATH:/Users/zhawry/bin/"
+# PATH="$PATH:~/bin/"
 
 
 #########################################################################
@@ -918,4 +918,5 @@ echo "       url('$i.woff') format('woff'),
 }" >> $STYLESHEETFILE
   fi
 done
+rm old
 echo "DONE!"
