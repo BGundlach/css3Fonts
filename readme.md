@@ -8,12 +8,12 @@ command line, to convert a set of TTF and OTF fonts into all the other
 currently used CSS3 @font-face formats (i.e. EOT, SVG, WOFF, WOFF2).  
 Syntax:
 
-    convertFonts.sh <filelist>
+    css3fonts <filelist>
 
 For example, if you wanted to convert all the .ttf files in the directory
 you are in, you could type in the command:
 
-    $ convertFonts.sh *.ttf
+    $ css3fonts *.ttf
 
 The fonts will then be converted to the .eot, .woff, and .svg formats.  It
 will also generate a stylesheet, stylesheet.css, that will produce the
@@ -32,37 +32,17 @@ Where: - [fontfilelist] is a space separated list of True Type (.ttf) or
          
        - [-options] are one of the following:
        
-         --use-font-weight: This option will merge all font-weights and 
-         styles under the same font name.  This option will likely crash
-         Apple Mobile Safari running under iOS versions less than 4.0.
-         Also note that only the first four weights and styles
-         will be recognized under IE7 and 8.
+         --use-font-weight: This option will merge all font-weights and styles under the same font name.  This option will likely crash Apple Mobile Safari running under iOS versions less than 4.0. Also note that only the first four weights and styles will be recognized under IE7 and 8.
          
-         --use-font-stretch: This option will merge all condensed and 
-         expanded fonts under the same font name as the normal font.
-         It is recommended *not* to use this method currently, since at
-         the time of this writing, font-stretch is only supported by 
-         Firefox => 9 and IE => 9.
+         --use-font-stretch: This option will merge all condensed and  expanded fonts under the same font name as the normal font. It is recommended *not* to use this method currently, since at the time of this writing, font-stretch is only supported by Firefox => 9 and IE => 9.
          
-         --autohint: This option will hint/re-hint fonts (using ttfautohint
-         by default, or Adobe Font Development Kit for OpenType if using
-         the --autohint=adobe option ). Note that this option will create
-         a bunch of files prefixed with 'hinted-'.  Attempting to use this 
-         option on files already prefixed with 'hinted-' will result in an 
-         error.
+         --autohint: This option will hint/re-hint fonts (using ttfautohint by default, or Adobe Font Development Kit for OpenType if using the --autohint=adobe option ). Note that this option will create a bunch of files prefixed with 'hinted-'.  Attempting to use this option on files already prefixed with 'hinted-' will result in an error.
 
-      	 --use-font-prefix=xxx: This option will prepend the name of all the
-      	 fonts with the string xxx.  This is useful when you are generating
-      	 different stylesheets using the converter with the same font 
-      	 but with different options.
+      	 --use-font-prefix=[prefix]: This option will prepend the name of all the fonts with this string.  This is useful when you are generating different stylesheets using the converter with the same font but with different options.
       
-      	 --output=xxx: This option will produce the resultant @font-face
-         stylesheet to the file xxx. By default, xxx is set to stylesheet.css
+      	 --output=[filename]: This option will produce the resultant @font-face stylesheet to [filename]. By default, the output is stylesheet.css
          
-         --show-features: Presents the user with a list of OpenType feature 
-         tags a font supports which can be used inside a style sheet using 
-         the CSS3 font-feature-settings property. The font can be in either 
-         be OpenType or TrueType.
+         --show-features: Presents the user with a list of OpenType feature tags a font supports which can be used inside a style sheet using the CSS3 font-feature-settings property. The font can be in either be OpenType or TrueType.
          
          --help: This help menu.
 ```
@@ -146,6 +126,6 @@ Jan 24, 2015 - Added symlink frindly code as well as a debian install script and
 CONTACT:
 --------
 
-Any bug reports, fixes or feature requests should be poted to the github repo at [https://github.com/BGundlach/css3FontConverter](https://github.com/BGundlach/css3FontConverter "css3fonts")
+Any bug reports, fixes or feature requests should be posted to the github repo at [https://github.com/BGundlach/css3FontConverter](https://github.com/BGundlach/css3FontConverter "css3fonts")
 
 If you think this script is pretty slick and want to hire me as a front end developer, contact me at GundlachWebDesign@gmail.com
