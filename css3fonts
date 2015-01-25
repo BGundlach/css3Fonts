@@ -293,19 +293,28 @@ the --clean option.  See --help for more details.  Bailing. " 1>&2
 
 fi 
 
-
-
-
 #.. converts a font to TTF
 toTTF () {
-	if [ "$FONTFORGE_EXT" = "bat" ]
+	if [ "$IS_WOFF" = "0" ]
 	then
-		echo "(Using MingW FontForge)"
-		$FONTFORGE -script `cygpath -w $SCRIPT_DIR/2ttf.pe` \
-			`cygpath -w $i` 2> /dev/null
-	else
-		echo "(Using Cygwin or Unix FontForge)"
-		$FONTFORGE -script $SCRIPT_DIR/2ttf.pe $i 
+		woff2sfnt $i > "$FILE_STUB".otf
+		i="$FILE_STUB".otf
+		IS_OTF="0"
+	fi
+	if [ "$IS_OTF" = "0" ]
+	then
+		if [ "$FONTFORGE_EXT" = "bat" ]
+		then
+			echo "(Using MingW FontForge)"
+			$FONTFORGE -script `cygpath -w $SCRIPT_DIR/2ttf.pe` \
+				`cygpath -w $i` 2> /dev/null
+		else
+			echo "(Using Cygwin or Unix FontForge)"
+			$FONTFORGE -script $SCRIPT_DIR/2ttf.pe $i 
+		fi
+	elif [ "$IS_WOFF2" = "0" ]
+	then
+		woff2_decompress $i
 	fi
 	
 }
@@ -557,6 +566,12 @@ do
 	file "$i" | grep "OpenType" > /dev/null
 	IS_OTF="$?"
 
+	cat "$i" | head -c 10 | grep "wOFF" > /dev/null
+	IS_WOFF="$?"
+
+	cat "$i" | head -c 10 | grep "wOF2" > /dev/null
+	IS_WOFF2="$?"
+
 	if [ "$IS_OTF" = "0" ]
 	then
 		ORIG_TYPE="otf"
@@ -564,10 +579,17 @@ do
 	elif [ "$IS_TTF" = "0" ]
 	then
 		ORIG_TYPE="ttf"
+	elif [ "$IS_WOFF" = "0" ]
+	then
+		ORIG_TYPE="woff"
+	elif [ "$IS_WOFF2" = "0" ]
+	then
+		ORIG_TYPE="woff2"
 	fi
 	
 	if [ "$DO_AUTOHINT" != "" -a \
 			\( \( "$ORIG_TYPE" = "ttf" -a "$AUTOHINTER" = "autohint" \) -o \
+			\( \( "$ORIG_TYPE" = "woff" -o "$ORIG_TYPE" = "woff2" \) -o \
 			\( "$ORIG_TYPE" = "otf" -a "$AUTOHINTER" = "ttfautohint" \) \) ]
 		then
 			echo "Error!  Cannot use $AUTOHINTER on $ORIG_TYPE fonts.  Bailing" 1>&2
@@ -576,11 +598,11 @@ do
 	
 	
 
-	if [ "$IS_OTF" = 0 -o "$IS_TTF" = 0 -o "$IS_SFD" = 0 ]
+	if [ "$IS_OTF" = 0 -o "$IS_TTF" = 0 -o "$IS_WOFF" = 0 -o "$IS_WOFF2" = 0 -o "$IS_SFD" = 0 ]
 	then
 		cp $i old
 	
-		NEW_FILE=`echo $i | sed "s/ /_/g; s/TTF$/ttf/; s/OTF$/otf/"`
+		NEW_FILE=`echo $i | sed "s/ /_/g; s/TTF$/ttf/; s/OTF$/otf/; s/WOFF$/woff/; s/WOFF2$/woff2/"`
 
 		if [ "$i" != "$NEW_FILE" ]
 		then
@@ -590,14 +612,14 @@ do
 		fi
 	
 		FILE_STUB=`echo $NEW_FILE | 
-			sed "s/\.[tT][tT][fF]$//" |
-			sed "s/\.[oO][tT][fF]$//"`
+			sed "s/\.[to]tf$//" |
+			sed "s/\.woff2?$//"`
 
 		# echo $FILE_STUB
 
-		#.. If this is an OTF Font, then convert it to TTF.  
+		#.. If this is an OTF, WOFF or WOFF2 Font, then convert it to TTF.  
 
-		if [ "$IS_OTF" = "0" ]
+		if [ "$IS_TTF" != "0" ]
 		then 
 		
 			if [ ! -f $FILE_STUB.ttf ]
