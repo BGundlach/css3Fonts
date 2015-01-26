@@ -4,31 +4,30 @@ QUICK START GUIDE:
 ------------------
 
 This CSS3 Font Converter is a shell script that allows developers, using a
-command line, to convert a set of TTF and OTF fonts into all the other
+command line, to convert a set of fonts, TTF/OTF/WOFF/WOFF2 into all the other
 currently used CSS3 @font-face formats (i.e. EOT, SVG, WOFF, WOFF2).  
 Syntax:
 
     css3fonts <filelist>
 
-For example, if you wanted to convert all the .ttf files in the directory
+For example, if you wanted to convert all the .woff2 files in the directory
 you are in, you could type in the command:
 
-    $ css3fonts *.ttf
+    $ css3fonts *.woff2
 
 The fonts will then be converted to the .eot, .woff, and .svg formats.  It
 will also generate a stylesheet, stylesheet.css, that will produce the
 @font-face rules using The New Bulletproof @Font-Face Syntax.  
 
-If you are converting .otf fonts, a .ttf font will be generated first before
-the other fonts. 
+If you are converting .otf fonts or .woff2, a .ttf font will be generated first before
+the other fonts. If you are converting .woff, it will first convert to .otf, then ttf.
 
 FULL COMMAND LINE OPTIONS:
 ---------------------------
 ```
 Usage: /Users/zhawry/bin/convertFonts.sh [-options] [fontfilelist]
 
-Where: - [fontfilelist] is a space separated list of True Type (.ttf) or
-         Open Type (.otf) fonts.
+Where: - [fontfilelist] is a space separated list of .ttf, .otf, .woff, or .woff2 files
          
        - [-options] are one of the following:
        
@@ -61,12 +60,14 @@ REQUIREMENTS:
 -------------
 
 This script uses the following programs to do the heavy listing.
-  - Fontforge:      [http://fontforge.sourceforge.net/](http://fontforge.sourceforge.net/)
-  - ttf2eot:        [http://www.npmjs.com/package/ttf2eot](http://www.npmjs.com/package/ttf2eot)
-  - sfnt2woff:      [http://people.mozilla.com/~jkew/woff/](http://people.mozilla.com/~jkew/woff/)
-  - ttfautohint:    [http://www.freetype.org/ttfautohint/](http://www.freetype.org/ttfautohint/)
-  - woff2_compress: [http://code.google.com/p/font-compression-reference/w/list](http://code.google.com/p/font-compression-reference/w/list)
-  - EOTFAST:        [http://eotfast.com/  *windows only*](http://eotfast.com/)
+  - Fontforge:        [http://fontforge.sourceforge.net/](http://fontforge.sourceforge.net/)
+  - ttf2eot:          [http://www.npmjs.com/package/ttf2eot](http://www.npmjs.com/package/ttf2eot)
+  - sfnt2woff:        [http://people.mozilla.com/~jkew/woff/](http://people.mozilla.com/~jkew/woff/)
+  - woff2sfnt:        [http://people.mozilla.com/~jkew/woff/](http://people.mozilla.com/~jkew/woff/)
+  - ttfautohint:      [http://www.freetype.org/ttfautohint/](http://www.freetype.org/ttfautohint/)
+  - woff2_compress:   [http://code.google.com/p/font-compression-reference/w/list](http://code.google.com/p/font-compression-reference/w/list)
+  - woff2_decompress: [http://code.google.com/p/font-compression-reference/w/list](http://code.google.com/p/font-compression-reference/w/list)
+  - EOTFAST:          [http://eotfast.com/  *windows only*](http://eotfast.com/)
   
 INSTALLATION:
 -------------
@@ -122,6 +123,8 @@ Sep 02, 2014 - Added support for WOFF2 fonts, if woff2_compress is in the user's
 ### Authored By Brian
 
 Jan 24, 2015 - Added symlink frindly code as well as a debian install script and updated ttf2eot to the maintained node module
+
+Jan 25, 2015 - Added support for woff and woff2 fonts as vaid input.
 
 CONTACT:
 --------
