@@ -22,6 +22,7 @@ will also generate a stylesheet, stylesheet.css, that will produce the
 If you are converting .otf fonts or .woff2, a .ttf font will be generated first before
 the other fonts. If you are converting .woff, it will first convert to .otf, then ttf.
 
+
 FULL COMMAND LINE OPTIONS:
 ---------------------------
 ```
@@ -97,7 +98,7 @@ git submodule update
 make clean all
 cp woff2_compress woff2_decompress ../
 cd ../
-git clone https://github.com/BGundlach/css3FontConverter.git
+git clone https://github.com/BGundlach/css3fonts.git
 ln -sT css3FontConverter/css3fonts ~/bin/css3fonts
 rm -r sfnt2woff-src woff2
 
@@ -129,6 +130,6 @@ Jan 25, 2015 - Added support for woff and woff2 fonts as vaid input.
 CONTACT:
 --------
 
-Any bug reports, fixes or feature requests should be posted to the github repo at [https://github.com/BGundlach/css3FontConverter](https://github.com/BGundlach/css3FontConverter "css3fonts")
+Any bug reports, fixes or feature requests should be posted to the github repo at [https://github.com/BGundlach/css3FontConverter](https://github.com/BGundlach/css3fonts "css3fonts")
 
 If you think this script is pretty slick and want to hire me as a front end developer, contact me at GundlachWebDesign@gmail.com
