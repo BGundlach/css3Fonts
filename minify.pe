@@ -1,0 +1,9 @@
+#!/usr/bin/fontforge
+Open($1)
+Select(0u20,0ua9)
+SelectMoreSingletons(0ua,0ud)
+SelectInvert()
+DetachAndRemoveGlyphs()
+Reencode("compacted")
+Generate($2+$1:r+".ttf")
+Generate($2+$1:r+".svg")
