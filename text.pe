@@ -1,0 +1,13 @@
+#!/usr/bin/fontforge
+Open($1)
+Select($3)
+i=4
+while ( i<$argc )
+  SelectMore($argv[i])
+  i = i+1
+endloop
+SelectInvert()
+DetachAndRemoveGlyphs()
+Reencode("compacted")
+Generate($2+$1:r+".ttf")
+Generate($2+$1:r+".svg")

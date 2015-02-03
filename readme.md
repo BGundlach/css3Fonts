@@ -26,11 +26,13 @@ the other fonts. If you are converting .woff, it will first convert to .otf, the
 FULL COMMAND LINE OPTIONS:
 ---------------------------
 ```
-Usage: /Users/zhawry/bin/convertFonts.sh [-options] [fontfilelist]
+Usage: css3fonts [-options] [fontfilelist]
 
 Where: - [fontfilelist] is a space separated list of .ttf, .otf, .woff, or .woff2 files
          
        - [-options] are one of the following:
+
+         --minify: This option limits the font to a-z A-Z 0-9 and a handful of symbols.  use =[string] to specify characters to limit this font to.
        
          --use-font-weight: This option will merge all font-weights and styles under the same font name.  This option will likely crash Apple Mobile Safari running under iOS versions less than 4.0. Also note that only the first four weights and styles will be recognized under IE7 and 8.
          
@@ -40,7 +42,7 @@ Where: - [fontfilelist] is a space separated list of .ttf, .otf, .woff, or .woff
 
       	 --use-font-prefix=[prefix]: This option will prepend the name of all the fonts with this string.  This is useful when you are generating different stylesheets using the converter with the same font but with different options.
       
-      	 --output=[filename]: This option will produce the resultant @font-face stylesheet to [filename]. By default, the output is stylesheet.css
+      	 --output=[filename]: This option will produce the resultant @font-face stylesheet to [filename]. By default, the output is c3f.css
          
          --show-features: Presents the user with a list of OpenType feature tags a font supports which can be used inside a style sheet using the CSS3 font-feature-settings property. The font can be in either be OpenType or TrueType.
          
@@ -125,7 +127,9 @@ Sep 02, 2014 - Added support for WOFF2 fonts, if woff2_compress is in the user's
 
 Jan 24, 2015 - Added symlink frindly code as well as a debian install script and updated ttf2eot to the maintained node module
 
-Jan 25, 2015 - Added support for woff and woff2 fonts as vaid input.
+Jan 25, 2015 - Added support for woff and woff2 fonts as valid input.
+
+Feb 3, 2015 - Added "--minify" option & associated capabilities.
 
 CONTACT:
 --------

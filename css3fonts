@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #########################################################################
-# CSS3 @font-face Converter v2.1
+# CSS3 @font-face Converter v3
 # by Zoltan Hawryluk (http://www.useragentman.com)
 # updated by Brian Gundlach (http://mrkt.ga/C)
 # More info available at http://mrkt.ga/F2
@@ -19,6 +19,11 @@
 # was originally in the PATH.
 # PATH="$PATH:~/bin/"
 
+########
+# TODO #
+########
+
+# Simplify options using getargs
 
 #########################################################################
 # OPTIONS                                                               #
@@ -30,6 +35,7 @@ SHOW_FEATURES=`echo "$ARGS" | grep '\--show-features'`
 USE_FONT_WEIGHT=`echo "$ARGS" | grep '\--use-font-weight'`
 USE_FONT_STRETCH=`echo "$ARGS" | grep '\--use-font-stretch'` 
 DO_AUTOHINT=`echo "$ARGS" | grep '\--autohint'`
+DO_COMPRESS=`echo "$ARGS" | grep '\--minify'`
 OUTPUT=`echo "$ARGS" | grep '\--output'`
 USE_FONT_PREFIX=`echo "$ARGS" | grep '\--use-font-prefix'`
 USE_TTF2EOT=`echo "$ARGS" | grep '\--use-ttf2eot'`
@@ -47,7 +53,7 @@ ARGS=`echo "$ARGS" | grep -v '\--'`
 STYLESHEETFILE=`echo $OUTPUT | awk -F'=' '{print $2}'`
 if [ "$STYLESHEETFILE" = "" ]
 then
-  STYLESHEETFILE='stylesheet.css'
+  STYLESHEETFILE='c3f.css'
 fi
 
 FONT_PREFIX="`echo $USE_FONT_PREFIX | awk -F'=' '{print $2}'`"
@@ -59,7 +65,13 @@ if [ "$FONT_PREFIX" = "" -a "$DO_AUTOHINT" != "" ]
 then
 	FONT_PREFIX="hinted-"
 fi
-
+if [ "$FONT_PREFIX" = "" -a "$DO_COMPRESS" != "" ] 
+then
+	if [ "`echo $DO_COMPRESS | awk -F'=' '{print $2}'`" != "" ]
+	FONT_PREFIX="h1-"
+else
+	FONT_PREFIX="en-"
+fi
 
 #.. Before we do anything else -- make sure the args are all real files.  If one
 #   of them isn't, bail, since we don't want the output to be something 
@@ -85,7 +97,6 @@ a file.  Bailing." 1>&2
   	exit 40
 	fi
 done
-
 if [ "$DO_AUTOHINT" != "" ]
 then
 
@@ -116,7 +127,7 @@ then
 * 
 * http://code.google.com/p/font-compression-reference/w/list
 *
-* (Click on the "gathering_compression_improvement_numbers" link).
+* (Click on the \"gathering_compression_improvement_numbers\" link).
 *
 * Not having WOFF2 support is not a show stopper, so we will continue converting 
 * your fonts, but you can save 30-50% on a font download with browsers that do
@@ -170,10 +181,12 @@ Released under the WTFPL 3.0, 2015.
 
 Usage: $0 [-options] [fontfilelist]
 
-Where: - [fontfilelist] is a space separated list of True Type (.ttf) or
-         Open Type (.otf) fonts.
+Where: - [fontfilelist] is a space separated list of ttf otf woff2 woff fonts.
          
        - [-options] are one of the following:
+
+         --minify: This option limits the font to a-z A-Z 0-9 and a handful
+          of symbols.  use =[string] to specify characters to limit this font.
        
          --use-font-weight: This option will merge all font-weights and 
          styles under the same font name.  This option will likely crash
@@ -201,7 +214,7 @@ Where: - [fontfilelist] is a space separated list of True Type (.ttf) or
       
       	 --output=[filename]: This option will produce the resultant 
       	 @font-face stylesheet to [filename]. By default, the output is 
-      	 stylesheet.css
+      	 c3f.css
          
          --show-features: Presents the user with a list of OpenType feature 
          tags a font supports which can be used inside a style sheet using 
@@ -210,7 +223,7 @@ Where: - [fontfilelist] is a space separated list of True Type (.ttf) or
          
          --help: This help menu.
          
-This script uses the following programs to do the heavy listing.
+This script uses the following programs to do the heavy lifting.
   - Fontforge:      http://fontforge.sourceforge.net/
   - ttf2eot:        http://www.npmjs.com/package/ttf2eot
   - sfnt2woff:      http://people.mozilla.com/~jkew/woff/
@@ -321,6 +334,28 @@ toTTF () {
 	fi
 	
 }
+
+minify () {
+	TEXT_STRING="`echo $DO_COMPRESS | awk -F'=' '{print $2}'`"
+
+	if [ "$TEXT_STRING" = "" ]
+	then
+		$FONTFORGE -script $SCRIPT_DIR/minify.pe $i $FONT_PREFIX
+	else
+		LIST=()
+		while [ ${#TEXT_STRING} -ge 1 ]; do
+			RVSED=`echo "$TEXT_STRING" | iconv -t unicode | hexdump -ve '/1 "%02x"' | head -c 8 | tail -c 4`
+			BYTE1=`printf $RVSED|tail -c2`
+			BYTE2=`printf $RVSED|head -c2`
+			CHAR=u$BYTE1$BYTE2
+			LIST+=($CHAR)
+			TEXT_STRING=`echo $TEXT_STRING|tail -c +2`
+		done
+		CHARS=($(printf '%s\n' "${LIST[@]}"|sort -u))
+		$FONTFORGE -script $SCRIPT_DIR/text.pe $i $FONT_PREFIX ${CHARS[@]}
+	fi
+	i=$FONT_PREFIX$i
+} 
 
 #.. converts a font to EOT format.  Uses EOTFAST if possible, fallbacks
 #   to TTF2EOT otherwise.  Note that that TTF2EOT is used if EOTFAST is
@@ -631,7 +666,14 @@ do
 			NEW_FILE="$FILE_STUB.ttf"
 		fi
 		
-		
+		if [ "$DO_COMPRESS" != "" ]
+		then
+			echo "compressing file"
+		 	minify
+			FILE_STUB="$FONT_PREFIX$FILE_STUB"
+			NEW_FILE="$FONT_PREFIX$NEW_FILE"
+		fi
+
 		#.. If --autohint option is set, we must hint
 		#   this file with ttfautohint
 		if [ "$DO_AUTOHINT" != "" ]
