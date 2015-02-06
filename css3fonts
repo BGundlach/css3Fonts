@@ -68,9 +68,11 @@ fi
 if [ "$FONT_PREFIX" = "" -a "$DO_COMPRESS" != "" ] 
 then
 	if [ "`echo $DO_COMPRESS | awk -F'=' '{print $2}'`" != "" ]
+		then
 	FONT_PREFIX="h1-"
 else
 	FONT_PREFIX="en-"
+fi
 fi
 
 #.. Before we do anything else -- make sure the args are all real files.  If one
