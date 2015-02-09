@@ -126,7 +126,6 @@ then
 
 "
 fi 
-
 #########################################################################
 ## PROGRAM AREA                                                         #
 #########################################################################
@@ -146,8 +145,6 @@ then
 	fi
 fi
 
-
-FILE_STUBS=''
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
   TARGET="$(readlink "$SOURCE")"
@@ -269,35 +266,13 @@ toTTF () {
 		i="$FILE_STUB".otf
 		IS_OTF="0"
 	fi
-	if [ "FONT_PREFIX" != "" -a $DO_COMPRESS == "0" -a $DO_AUTOHINT == "0" ]
-	then
 	if [ "$IS_OTF" = "0" ]
-		then
-		if [ "$FONTFORGE_EXT" = "bat" ]
-		then
-			echo "(Using MingW FontForge)"
-			$FONTFORGE -script `cygpath -w $SCRIPT_DIR/2ttf-pfx.pe` \
-				`cygpath -w $i` $FONT_PREFIX 2> /dev/null
-		else
-			echo "(Using Cygwin or Unix FontForge)"
-			$FONTFORGE -script $SCRIPT_DIR/2ttf-pfx.pe $i $FONT_PREFIX
-		fi
-	elif [ "$IS_WOFF2" = "0" ]
 	then
-		woff2_decompress $i
-		i="$FILE_STUB".ttf
-		mv $i $FONT_PREFIX$i
-		i=$FONT_PREFIX$i
-		IS_TTF="0"
-	fi
-	else
-	if [ "$IS_OTF" = "0" ]
-		then
 		if [ "$FONTFORGE_EXT" = "bat" ]
 		then
 			echo "(Using MingW FontForge)"
 			$FONTFORGE -script `cygpath -w $SCRIPT_DIR/2ttf.pe` \
-				`cygpath -w $i` 2> /dev/null
+			`cygpath -w $i` 2> /dev/null
 		else
 			echo "(Using Cygwin or Unix FontForge)"
 			$FONTFORGE -script $SCRIPT_DIR/2ttf.pe $i 
@@ -308,7 +283,6 @@ toTTF () {
 		i="$FILE_STUB".ttf
 		IS_TTF="0"
 	fi
-fi
 	
 }
 
@@ -614,6 +588,7 @@ do
 
 	if [ "$IS_OTF" = 0 -o "$IS_TTF" = 0 -o "$IS_WOFF" = 0 -o "$IS_WOFF2" = 0 -o "$IS_SFD" = 0 ]
 	then
+		    
 		cp $i old
 	
 		NEW_FILE=`echo $i | sed "s/ /_/g; s/TTF$/ttf/; s/OTF$/otf/; s/WOFF$/woff/; s/WOFF2$/woff2/"`
@@ -623,6 +598,14 @@ do
 			echo "Removing spaces in font name."
 			mv $i $NEW_FILE
 			i="$NEW_FILE"
+		fi
+
+		if [ "$FONT_PREFIX" != "" -a $DO_COMPRESS == "0" -a $DO_AUTOHINT == "0" ]
+		then
+		NEW_FILE=$FONT_PREFIX$NEW_FILE
+		NEW_FILE=`echo $NEW_FILE | sed "s/ /_/g;"
+		mv $i $NEW_FILE
+		i="$NEW_FILE"
 		fi
 	
 		FILE_STUB=`echo $NEW_FILE | 
