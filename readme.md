@@ -10,10 +10,9 @@ Syntax:
 
     css3fonts <filelist>
 
-For example, if you wanted to convert all the .woff2 files in the directory
-you are in, you could type in the command:
+For example, if you wanted to convert all the ttf files in your projects fonts folder and output the stylesheet to your scss folder, In your project base you could type in the command:
 
-    $ css3fonts *.woff2
+    $ css3fonts fonts/*.ttf --prefix="ProjectName" -o scss/_fonts.scss
 
 The fonts will then be converted to the .eot, .woff, and .svg formats.  It
 will also generate a stylesheet, stylesheet.css, that will produce the
