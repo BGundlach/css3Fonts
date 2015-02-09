@@ -19,59 +19,63 @@
 # was originally in the PATH.
 # PATH="$PATH:~/bin/"
 
-########
-# TODO #
-########
-
-# Simplify options using getargs
-
 #########################################################################
 # OPTIONS                                                               #
 #########################################################################
+# NOTE: This requires GNU getopt.  On Mac OS X and FreeBSD, you have to install this SEPARATELY
+# set default flags
+SHOW_FEATURES="0"
+CLEANUP="0"
+SHOW_HELP="0"
+USE_FONT_STRETCH="0"
+USE_FONT_WEIGHT="0"
+DO_AUTOHINT="0"
+DO_COMPRESS="0"
+STYLESHEETFILE='c3f.css'
+# read the options
+TEMP=`getopt -o chwsfHm::o:p: --long show-features,clean,help,autohint,minify::,output:,prefix:,stretch,weight -n 'css3fonts' -- "$@"`
+eval set -- "$TEMP"
+
+# extract options and their arguments into variables.
+while true ; do
+    case "$1" in
+        -m|--minify)
+            case "$2" in
+                "") DO_COMPRESS="1" ; shift 2 ;;
+                *) DO_COMPRESS="$2" ; shift 2 ;;
+            esac ;;
+        -o|--output) STYLESHEETFILE="$2" ; shift 2 ;;
+        -p|--prefix) FONT_PREFIX="$2" ; shift 2 ;;
+        -c|--clean) CLEANUP="1" ; shift ;;
+        -w|--weight) USE_FONT_WEIGHT="1" ; shift ;;
+        -h|--help) SHOW_HELP="1" ; shift ;;
+        -s|--stretch) USE_FONT_STRETCH="1" ; shift ;;
+        -f|--show-features) SHOW_FEATURES="1" ; shift ;;
+        -H|--autohint) DO_AUTOHINT="1" ; shift ;;
+        --) shift ; break ;;
+        *) echo "$1 is an Invalid argument!" ; exit 1 ;;
+    esac
+done
 ARGS=`echo $* | tr ' ' '
 '`
-
-SHOW_FEATURES=`echo "$ARGS" | grep '\--show-features'`
-USE_FONT_WEIGHT=`echo "$ARGS" | grep '\--use-font-weight'`
-USE_FONT_STRETCH=`echo "$ARGS" | grep '\--use-font-stretch'` 
-DO_AUTOHINT=`echo "$ARGS" | grep '\--autohint'`
-DO_COMPRESS=`echo "$ARGS" | grep '\--minify'`
-OUTPUT=`echo "$ARGS" | grep '\--output'`
-USE_FONT_PREFIX=`echo "$ARGS" | grep '\--use-font-prefix'`
-USE_TTF2EOT=`echo "$ARGS" | grep '\--use-ttf2eot'`
-
-
-CLEANUP=`echo "$ARGS" | grep '\--clean'` 
- 
-SHOW_HELP=`echo "$ARGS" | grep '\--help'`
-
-OPTIONS=`echo "$ARGS" | grep '\--' | tr '
-' ' '`
+echo $FONT_PREFIX
 
 ARGS=`echo "$ARGS" | grep -v '\--'`
-
-STYLESHEETFILE=`echo $OUTPUT | awk -F'=' '{print $2}'`
-if [ "$STYLESHEETFILE" = "" ]
-then
-  STYLESHEETFILE='c3f.css'
-fi
-
-FONT_PREFIX="`echo $USE_FONT_PREFIX | awk -F'=' '{print $2}'`"
 
 #.. is 0 if has this binary, non-zero otherwise 
 HAS_WOFF2_COMPRESS=`which 'woff2_compress' > /dev/null; echo $?`
 
-if [ "$FONT_PREFIX" = "" -a "$DO_AUTOHINT" != "" ] 
+if [ "$FONT_PREFIX" = "" -a "$DO_AUTOHINT" != "0" ] 
 then
 	FONT_PREFIX="hinted-"
 fi
-if [ "$FONT_PREFIX" = "" -a "$DO_COMPRESS" != "" ] 
+if [ "$FONT_PREFIX" = "" -a "$DO_COMPRESS" != "0" ] 
 then
-	if [ "`echo $DO_COMPRESS | awk -F'=' '{print $2}'`" != "" ]
-		then
-	FONT_PREFIX="h1-"
-else
+	if [ "$DO_COMPRESS" == "1" ]
+	then
 	FONT_PREFIX="en-"
+else
+	FONT_PREFIX="h1-"
 fi
 fi
 
@@ -80,7 +84,7 @@ fi
 #   unexpected and BAD.
 
 
-if [ "$ARGS" = "" -a "$CLEANUP" = "" -a "$SHOW_HELP" = "" ]
+if [ "$ARGS" = "" -a "$CLEANUP" = "0" -a "$SHOW_HELP" = "0" ]
 then
 	echo
 	echo "No arguments.  Bailing."
@@ -99,23 +103,6 @@ a file.  Bailing." 1>&2
   	exit 40
 	fi
 done
-if [ "$DO_AUTOHINT" != "" ]
-then
-
-	AUTOHINTER="`echo $DO_AUTOHINT | awk -F'=' '{print $2}'`"
-
-	if [ "$AUTOHINTER" = "" ]
-	then
-		AUTOHINTER="ttfautohint"
-	elif [ "$AUTOHINTER" = "adobe" ]
-	then
-		AUTOHINTER="autohint"
-	elif [ "$AUTOHINTER" != "ttfautohint" ]
-	then
-		echo "The autohint option must be set to either ttfautohint or adobe. Bailing" 1>&2
-		exit 30 
-	fi
-fi
 
 if [ "$HAS_WOFF2_COMPRESS" != "0" ]
 then
@@ -139,7 +126,6 @@ then
 
 "
 fi 
-
 #########################################################################
 ## PROGRAM AREA                                                         #
 #########################################################################
@@ -159,8 +145,6 @@ then
 	fi
 fi
 
-
-FILE_STUBS=''
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
   TARGET="$(readlink "$SOURCE")"
@@ -175,7 +159,7 @@ SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 IFS=$(echo -en "\n\b")
 
 
-if [ "$SHOW_HELP" != "" ]
+if [ "$SHOW_HELP" != "0" ]
 then
   echo "
 CSS3 Font Converter by Brian Gundlach.
@@ -187,63 +171,28 @@ Where: - [fontfilelist] is a space separated list of ttf otf woff2 woff fonts.
          
        - [-options] are one of the following:
 
-         --minify: This option limits the font to a-z A-Z 0-9 and a handful
-          of symbols.  use =[string] to specify characters to limit this font.
-       
-         --use-font-weight: This option will merge all font-weights and 
-         styles under the same font name.  This option will likely crash
-         Apple Mobile Safari running under iOS versions less than 4.0.
-         Also note that only the first four weights and styles
-         will be recognized under IE7 and 8.
-         
-         --use-font-stretch: This option will merge all condensed and 
-         expanded fonts under the same font name as the normal font.
-         It is recommended *not* to use this method currently, since at
-         the time of this writing, font-stretch is only supported by 
-         Firefox => 9 and IE => 9.
-         
-         --autohint: This option will hint/re-hint fonts (using ttfautohint
-         by default, or Adobe Font Development Kit for OpenType if using
-         the --autohint=adobe option ). Note that this option will create
-         a bunch of files prefixed with 'hinted-'.  Attempting to use this 
-         option on files already prefixed with 'hinted-' will result in an 
-         error.
-
-      	 --use-font-prefix=[prefix]: This option will prepend the name of 
-      	 all the fonts with this string.  This is useful when you are 
-      	 generating different stylesheets using the converter with the same
-      	 font but with different options.
-      
-      	 --output=[filename]: This option will produce the resultant 
-      	 @font-face stylesheet to [filename]. By default, the output is 
-      	 c3f.css
-         
-         --show-features: Presents the user with a list of OpenType feature 
-         tags a font supports which can be used inside a style sheet using 
-         the CSS3 font-feature-settings property. The font can be in either 
-         be OpenType or TrueType.
-         
-         --help: This help menu.
-         
-This script uses the following programs to do the heavy lifting.
-  - Fontforge:      http://fontforge.sourceforge.net/
-  - ttf2eot:        http://www.npmjs.com/package/ttf2eot
-  - sfnt2woff:      http://people.mozilla.com/~jkew/woff/
-  - ttfautohint:    http://www.freetype.org/ttfautohint/
-  - woff2_compress: http://code.google.com/p/font-compression-reference/w/list
-  - EOTFAST:        http://eotfast.com/  *windows only*
+-m --minify[=<string>]  limits the font to <string> or A-z,0-9 and punctuation
+-w --weight             merge font-weights and styles under same font name
+-s --stretch            merge condensed and expanded fonts under same font name
+-H --autohint           hint fonts
+-p --prefix=<prefix>    prepend the name of all the fonts with this string
+-o --output=<filename>  the default output file is c3f.css
+-f --show-features      display a list of OpenType feature tags a font supports
+-h --help               this help menu.
   
-This script can run on any version of UNIX running bash, and is
-designed to also run under Windows using Cygwin. Installation instructions 
-and more information can be found at http://github.com/BGundlach/css3fonts
-or http://mrkt.ga/F2
-         
+This script can run on any version of linux running bash and is designed to 
+also run under Windows using Cygwin. Installation instructions and more 
+information can be found at http://github.com/BGundlach/css3fonts or 
+http://mrkt.ga/F2
+
+BSD derivitives (looking at you mac) may need to install the linux getopt 
+for this script to work properly.
 "
   exit 1
 
 #.. if --show-features is set, then we just open the font file and show what
 #   font feautres are supported by the font
-elif [ "$SHOW_FEATURES" != "" ]
+elif [ "$SHOW_FEATURES" != "0" ]
 then
   for i in $ARGS
   do
@@ -268,7 +217,7 @@ then
 
 #.. if the clean option is set, let's get rid of all files this
 #   script may have created.
-elif [ "$CLEANUP" != "" ]
+elif [ "$CLEANUP" != "0" ]
 then
 
   echo "
@@ -293,7 +242,7 @@ Are you *sure* you want to do this [y/N]?"
 
 #.. if the filelist contains any files prefixed with 'hinted-' and the 
 #   --autohint option is set, give an error and exit immediately.
-elif [ "$DO_AUTOHINT" != "" ]
+elif [ "$DO_AUTOHINT" != "0" ]
 then
   HINTED_FILES=`echo "$ARGS" | egrep "^hinted-"`
   
@@ -323,7 +272,7 @@ toTTF () {
 		then
 			echo "(Using MingW FontForge)"
 			$FONTFORGE -script `cygpath -w $SCRIPT_DIR/2ttf.pe` \
-				`cygpath -w $i` 2> /dev/null
+			`cygpath -w $i` 2> /dev/null
 		else
 			echo "(Using Cygwin or Unix FontForge)"
 			$FONTFORGE -script $SCRIPT_DIR/2ttf.pe $i 
@@ -338,12 +287,11 @@ toTTF () {
 }
 
 minify () {
-	TEXT_STRING="`echo $DO_COMPRESS | awk -F'=' '{print $2}'`"
-
-	if [ "$TEXT_STRING" = "" ]
+	if [ "$DO_COMPRESS" == "1" ]
 	then
 		$FONTFORGE -script $SCRIPT_DIR/minify.pe $i $FONT_PREFIX
 	else
+		TEXT_STRING="$DO_COMPRESS"
 		LIST=()
 		while [ ${#TEXT_STRING} -ge 1 ]; do
 			RVSED=`echo "$TEXT_STRING" | iconv -t unicode | hexdump -ve '/1 "%02x"' | head -c 8 | tail -c 4`
@@ -545,13 +493,13 @@ do
 done
 
 # .. check for ttfautohint is installed if --autohint option is set
-if [ "$DO_AUTOHINT" != "" ]
+if [ "$DO_AUTOHINT" != "0" ]
 then
-	which $AUTOHINTER > /dev/null 2> /dev/null
+	which ttfautohint > /dev/null 2> /dev/null
 	if [ "$?" != "0" ]
 	then
-		echo "Error: Package $AUTOHINTER is not installed. You cannot use the 
-	--autohint=$AUTOHINTER option without it.  Bailing.
+		echo "Error: Package ttfautohint is not installed. You cannot use the 
+	--autohint option without it.  Bailing.
 	" 1>&2
 		exit 2
 	else
@@ -627,7 +575,7 @@ do
 		ORIG_TYPE="woff2"
 	fi
 	
-	if [ "$DO_AUTOHINT" != "" -a \
+	if [ "$DO_AUTOHINT" != "0" -a \
 			\( \( "$ORIG_TYPE" = "ttf" -a "$AUTOHINTER" = "autohint" \) -o \
 			\( "$ORIG_TYPE" = "woff" -o "$ORIG_TYPE" = "woff2" \) -o \
 			\( "$ORIG_TYPE" = "otf" -a "$AUTOHINTER" = "ttfautohint" \) \) ]
@@ -640,6 +588,7 @@ do
 
 	if [ "$IS_OTF" = 0 -o "$IS_TTF" = 0 -o "$IS_WOFF" = 0 -o "$IS_WOFF2" = 0 -o "$IS_SFD" = 0 ]
 	then
+		    
 		cp $i old
 	
 		NEW_FILE=`echo $i | sed "s/ /_/g; s/TTF$/ttf/; s/OTF$/otf/; s/WOFF$/woff/; s/WOFF2$/woff2/"`
@@ -649,6 +598,14 @@ do
 			echo "Removing spaces in font name."
 			mv $i $NEW_FILE
 			i="$NEW_FILE"
+		fi
+
+		if [ "$FONT_PREFIX" != "" -a $DO_COMPRESS == "0" -a $DO_AUTOHINT == "0" ]
+		then
+		NEW_FILE=$FONT_PREFIX$NEW_FILE
+		NEW_FILE=`echo $NEW_FILE | sed "s/ /_/g;"
+		mv $i $NEW_FILE
+		i="$NEW_FILE"
 		fi
 	
 		FILE_STUB=`echo $NEW_FILE | 
@@ -668,7 +625,7 @@ do
 			NEW_FILE="$FILE_STUB.ttf"
 		fi
 		
-		if [ "$DO_COMPRESS" != "" ]
+		if [ "$DO_COMPRESS" != "0" ]
 		then
 			echo "compressing file"
 		 	minify
@@ -678,7 +635,7 @@ do
 
 		#.. If --autohint option is set, we must hint
 		#   this file with ttfautohint
-		if [ "$DO_AUTOHINT" != "" ]
+		if [ "$DO_AUTOHINT" != "0" ]
 		then
 		
 			echo "Hinting $NEW_FILE ..."
@@ -700,7 +657,7 @@ do
 		#.. do not convert a font to svg format if we are using
 		#   --use-font-weight, since several SVG declarations of
 		#   the same font will not work in iOS < 4.2.
-		if [ "$USE_FONT_WEIGHT" = "" ]
+		if [ "$USE_FONT_WEIGHT" = "0" ]
 		then
 		
 			if [ ! -f $FILE_STUB.svg ]
@@ -718,7 +675,7 @@ do
 			# NOTE: we use $i instead of $NEW_FILE, since woff is
 			# just a wrapper for OTF and TTF.  Having the original
 			# OTF is better here, unless we are autohinting.
-			if [ "$DO_AUTOHINT" != "" ]
+			if [ "$DO_AUTOHINT" != "0" ]
 			then
 				echo "Converting $FILE_STUB to woff from converted TTF"
 				toWOFF $NEW_FILE
@@ -735,13 +692,13 @@ do
 			# NOTE: we use $i instead of $NEW_FILE, since woff2 is
 			# just a wrapper for OTF and TTF.  Having the original
 			# OTF is better here, unless we are autohinting.
-			if [ "$DO_AUTOHINT" = "" ]
+			if [ "$DO_AUTOHINT" = "0" ]
 			then
 				echo "Converting $FILE_STUB to woff2 from $i."
 				toWOFF2 $i
 			fi
 
-			if [ "$?" != "0" -o "$DO_AUTOHINT" != "" ]
+			if [ "$?" != "0" -o "$DO_AUTOHINT" != "0" ]
 			then
 				echo "Converting $FILE_STUB to woff2 from converted TTF ($NEW_FILE)"
 				toWOFF2 $NEW_FILE
@@ -762,21 +719,10 @@ echo "Writing Stylesheet ..."
 
 COMMENT=\
 "/*
- * This stylesheet generated by the CSS3 @font-face generator v2.0
+ * This stylesheet generated by the CSS3 @font-face generator v3.0
  * by Brian Gundlach (http://mrkt.ga/C). 
  * Latest version of this program is available at
- * https://github.com/BGundlach/css3fonts"
- 
-if [ "$OPTIONS" != "" ]
-then
-  COMMENT="$COMMENT
- *
- * Generated with the following options:
- * 
- * $OPTIONS"
-fi
-
-COMMENT="$COMMENT
+ * https://github.com/BGundlach/css3fonts
  */
 " 
 
@@ -788,7 +734,7 @@ for i in $FILE_STUBS
 do
 
 	
-	if [ "$USE_FONT_WEIGHT" != "" ]
+	if [ "$USE_FONT_WEIGHT" != "0" ]
 	then
 		#.. first, get the info about the font from fontforge.
 		getFontInfo $i
@@ -853,7 +799,7 @@ do
 			FONT_STYLE="normal";
 		fi
 		
-		if [ "$USE_FONT_STRETCH" != "" ]
+		if [ "$USE_FONT_STRETCH" != "0" ]
 		then
 			if [ "$IS_CONDENSED" = "T" ]
 			then
@@ -885,7 +831,7 @@ do
 		#.. we also remove the words "Condensed" and "Expanded" if the --use-font-stretch 
 		#   option is enabled.
 		
-		if [ "$USE_FONT_STRETCH" != "" ]
+		if [ "$USE_FONT_STRETCH" != "0" ]
 		then
 			FONTNAME_SED_OPTIONS="$FONTNAME_SED_OPTIONS;
 			   s/[cC][oO][nN][dD][eE][nN][sS][eE][dD]//g;
@@ -899,7 +845,7 @@ do
 			     
 		FONTNAME=`echo $INFO_FONTNAME | awk -F": " '{print $2}' |
 			sed "$FONTNAME_SED_OPTIONS" | sed "s/[-_]*$//g"`
-		FONTNAME="$FONT_PREFIX$FONTNAME"
+		FONTNAME="$FONT_PREFIX$FILE_STUB"
 		echo -n "Font: $FONTNAME"
 		
 		if [ "$FONT_STRETCH" != "normal" -a  "$FONT_STRETCH" != "" ]
@@ -930,7 +876,7 @@ do
 	fi
 
 	
-  if [ "$USE_FONT_WEIGHT" != "" ]
+  if [ "$USE_FONT_WEIGHT" != "0" ]
   then
   
   
@@ -951,7 +897,7 @@ RULE="$RULE url('$i.woff') format('woff'), $EXTRA_FONT_INFO url('$i.ttf')  forma
 	
 	
 	
-	if [ "$USE_FONT_STRETCH" != "" ]
+	if [ "$USE_FONT_STRETCH" != "0" ]
 	then
 
 		RULE="$RULE
