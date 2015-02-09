@@ -165,11 +165,11 @@ then
 CSS3 Font Converter by Brian Gundlach.
 Released under the WTFPL 3.0, 2015.
 
-Usage: $0 [-options] [fontfilelist]
+Usage: $0 [--options] [fontfilelist]
 
 Where: - [fontfilelist] is a space separated list of ttf otf woff2 woff fonts.
          
-       - [-options] are one of the following:
+       - [--options] are one of the following:
 
 -m --minify[=<string>]  limits the font to <string> or A-z,0-9 and punctuation
 -w --weight             merge font-weights and styles under same font name
