@@ -42,7 +42,7 @@ Where: - [fontfilelist] is a space separated list of ttf otf woff2 woff fonts.
   
 This script can run on any version of linux running bash and is designed to 
 also run under Windows using Cygwin. Installation instructions and more 
-information can be found at http://github.com/BGundlach/css3fonts or 
+information can be found at http://github.com/BGundlach/css3Fonts or 
 http://mrkt.ga/F2
 
 BSD derivitives (looking at you mac) may need to install the linux getopt 
@@ -100,8 +100,8 @@ git submodule update
 make clean all
 cp woff2_compress woff2_decompress ../
 cd ../
-git clone https://github.com/BGundlach/css3fonts.git
-ln -sT css3FontConverter/css3fonts ~/bin/css3fonts
+git clone https://github.com/BGundlach/css3Fonts.git
+ln -sT css3Fonts/css3fonts ~/bin/css3fonts
 rm -r sfnt2woff-src woff2
 
 ```
@@ -134,6 +134,6 @@ Feb 3, 2015 - Added "--minify" option & associated capabilities.
 CONTACT:
 --------
 
-Any bug reports, fixes or feature requests should be posted to the github repo at [https://github.com/BGundlach/css3FontConverter](https://github.com/BGundlach/css3fonts "css3fonts")
+Any bug reports, fixes or feature requests should be posted to the github repo at [https://github.com/BGundlach/css3Fonts](https://github.com/BGundlach/css3Fonts "css3fonts")
 
 If you think this script is pretty slick and want to hire me as a front end developer, contact me at GundlachWebDesign@gmail.com
