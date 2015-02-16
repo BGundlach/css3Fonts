@@ -1,3 +1,4 @@
+#! /usr/bin/fontforge
 Open($1);
 gpos = GetLookups("gpos");
 gsub = GetLookups("gsub");

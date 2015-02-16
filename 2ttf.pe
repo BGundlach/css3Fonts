@@ -1,3 +1,4 @@
+#! /usr/bin/fontforge
 Open($1)
 SetFontNames($1:r,$1:r,$1:r)
 Generate($1:r + ".ttf")

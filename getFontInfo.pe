@@ -1,3 +1,4 @@
+#! /usr/bin/fontforge
 Open($1)
 Print('Font name: ' + $fontname)
 Print('Full name: ' + $fullname)
